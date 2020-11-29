@@ -54,6 +54,10 @@ public class StaticDispatcher implements Dispatcher {
 			for(StaticThread thread: threads) {
 				thread.start();
 			}
+			// Odota säikeiden suoritusta
+			for(StaticThread thread: threads) {
+				thread.join();
+			}
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
