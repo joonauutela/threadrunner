@@ -35,12 +35,11 @@ public class WithOutThreadsDispatcher implements Dispatcher {
 			Worker worker = WorkerFactory.createWorker(controlSet.getWorkerType());
 
 			for (int time : ilist) {
+				System.out.println(time);
 				worker.count(time);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-
 	}
-
 }
