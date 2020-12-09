@@ -10,29 +10,27 @@ import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
 /**
  * 
  * SharedData-luokkaa käytetään ainoastaan luokissa DynamicCounter.java ja DynamicDisaptcher.java
+ * 
+ * Datalle on tässä tilanteessa mielekkäämpi luoda olio sen sijaan, että käyttäisi esim. sisäkkäisiä ArrayListejä
  *
  */
 public class SharedData {
-	ArrayList<ArrayList<Integer>> ilistSubGroups;
+	
+	ArrayList<ArrayList<Integer>> taskGroups;
 	
 	public SharedData() {
-		 ilistSubGroups = new ArrayList<ArrayList<Integer>>();
+		taskGroups = new ArrayList<ArrayList<Integer>>();
 	}
 	
-	public void addSubList(ArrayList<Integer> subList) {
-		ilistSubGroups.add(subList);
+	public void addTasks(ArrayList<Integer> subList) {
+		taskGroups.add(subList);
 	}
 	
-	public synchronized ArrayList<Integer> getSubList(){
-		ArrayList<Integer> list = ilistSubGroups.remove(0);
-		return list;
-	}
-	
-	public void getCount() {
-		System.out.println(ilistSubGroups.size());
+	public synchronized ArrayList<Integer> assignTasks(){
+		return taskGroups.remove(0);
 	}
 	
 	public synchronized boolean areTasksLeft() {
-		return ilistSubGroups.size() > 0;
+		return taskGroups.size() > 0;
 	}
 }

@@ -48,7 +48,7 @@ public class DynamicDispatcher implements Dispatcher {
 					take = (int)Math.ceil(tasksPerThread/3);
 				}
 				ArrayList<Integer> ilistThread = new ArrayList<Integer>(ilist.subList(i, Math.min( ilist.size(), i + take )));		
-				sharedData.addSubList(ilistThread);
+				sharedData.addTasks(ilistThread);
 			}
 			
 			// Alusta ja käynnistä koordinaattorisäie

@@ -27,12 +27,12 @@ public class DynamicCounter extends Thread {
 	
 	public void run() {
 
-		ArrayList<Integer> list;
+		ArrayList<Integer> ilist;
 		try {
 			Worker worker = WorkerFactory.createWorker(controlSet.getWorkerType());
 			while(sd.areTasksLeft()) {
-				list = sd.getSubList();
-				for (int time :  list) {
+				ilist = sd.assignTasks();
+				for (int time :  ilist) {
 					worker.count(time);
 				}
 			}
