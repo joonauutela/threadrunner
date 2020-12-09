@@ -10,7 +10,7 @@ package fi.utu.tech.ThreadRunner.dispatchers;
 * @since       1.0          
 */
 
-public interface Dispatcher {
+public interface IDispatcher {
 
 	public void dispatch(ControlSet controlSet);
 

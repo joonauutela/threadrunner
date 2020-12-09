@@ -1,8 +1,5 @@
 package fi.utu.tech.ThreadRunner.dispatchers;
 
-import java.util.ArrayList;
-import fi.utu.tech.ThreadRunner.tasks.Countable;
-import fi.utu.tech.ThreadRunner.tasks.TaskFactory;
 import fi.utu.tech.ThreadRunner.counters.StaticCounter;
 /*
  * Luokka, jossa toteutetaan staattinen tehtävien jako ts. työn tehtävä 1
@@ -11,7 +8,7 @@ import fi.utu.tech.ThreadRunner.counters.StaticCounter;
 * @since       1.0          
 */
 
-public class StaticDispatcher implements Dispatcher {
+public class StaticDispatcher extends DispatcherBase {
 
 	/**
 	 * Metodi, jossa on toteutettu staattinen tehtäväjako toiminnallisuus.
@@ -23,31 +20,18 @@ public class StaticDispatcher implements Dispatcher {
 	 */
 	public void dispatch(ControlSet controlSet) {
 		try {
-			Countable co = TaskFactory.createTask(controlSet.getTaskType());
-			// Luo tehtävät
-			ArrayList<Integer> ilist = co.generate(controlSet.getAmountTasks(), controlSet.getMaxTime());
-			// Alusta lista säikeille
-			ArrayList<StaticCounter> threads = new ArrayList<StaticCounter>();
+			var taskGroup = super.buildTaskGroup(controlSet);
+			var taskGroupData = taskGroup.getTaskGroupData();
 			
-			// Muuttuja-alustukset tehtäväjakoa varten
-			int threadCount = controlSet.getThreadCount();
-			float tasksPerThread = ilist.size()/(float)threadCount;
-			int minTasksPerThread = (int)Math.floor(tasksPerThread);
-			int bonusTasksForFirstNThreads = (int)Math.ceil((tasksPerThread%1)*threadCount);  
+			Thread[] threads = new Thread[taskGroupData.size()];
 			
-			// Jaa tehtävät säikeille
-			for(int threadId=0,firstTaskId = 0; threadId < threadCount; threadId++) {
-				int lastTaskId = firstTaskId+ minTasksPerThread+ (threadId<bonusTasksForFirstNThreads?1:0); 
-				var subList = ilist.subList(firstTaskId,lastTaskId);		
-				threads.add(new StaticCounter(new ArrayList<Integer>(subList), controlSet));
-				firstTaskId = lastTaskId; 
+			for(int i=0;i<threads.length;i++)
+			{
+				threads[i] = new StaticCounter(taskGroupData.get(i), controlSet);
 			}
-						
-			// Käynnistä säikeet
-			for(StaticCounter thread: threads) thread.start();
-			// Odota säikeiden suoritusta
-			for(StaticCounter thread: threads) thread.join();
 			
+			for(Thread t : threads) t.start();
+			for(Thread t : threads) t.join();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

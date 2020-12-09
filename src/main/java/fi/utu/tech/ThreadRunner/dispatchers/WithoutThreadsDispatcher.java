@@ -16,7 +16,7 @@ import fi.utu.tech.ThreadRunner.tasks.TaskFactory;
 import fi.utu.tech.ThreadRunner.workers.Worker;
 import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
 
-public class WithOutThreadsDispatcher implements Dispatcher {
+public class WithoutThreadsDispatcher extends DispatcherBase {
 
 	/**
 	 * Metodi, jossa on toteutettu laskennan toiminnallisuus.
@@ -35,7 +35,6 @@ public class WithOutThreadsDispatcher implements Dispatcher {
 			Worker worker = WorkerFactory.createWorker(controlSet.getWorkerType());
 
 			for (int time : ilist) {
-				System.out.println(time);
 				worker.count(time);
 			}
 		} catch (Exception ex) {

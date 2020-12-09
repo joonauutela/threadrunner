@@ -11,9 +11,9 @@ import java.io.IOException;
 import fi.utu.tech.ThreadRunner.UI.MainWindowController;
 import fi.utu.tech.ThreadRunner.UI.StatisticLine;
 import fi.utu.tech.ThreadRunner.dispatchers.ControlSet;
-import fi.utu.tech.ThreadRunner.dispatchers.Dispatcher;
+import fi.utu.tech.ThreadRunner.dispatchers.IDispatcher;
 import fi.utu.tech.ThreadRunner.dispatchers.DynamicDispatcher;
-import fi.utu.tech.ThreadRunner.dispatchers.WithOutThreadsDispatcher;
+import fi.utu.tech.ThreadRunner.dispatchers.WithoutThreadsDispatcher;
 import fi.utu.tech.ThreadRunner.dispatchers.StaticDispatcher;
 import fi.utu.tech.ThreadRunner.tasks.TaskFactory;
 import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
@@ -60,7 +60,7 @@ public class App extends Application {
 	}
 
 	public static void runStatic(ControlSet controlSet) {
-		Dispatcher disp = new StaticDispatcher();
+		IDispatcher disp = new StaticDispatcher();
 		long startTime = System.nanoTime();
 		disp.dispatch(controlSet);
 		Float timing = Float.valueOf((System.nanoTime() - startTime) / (1000000));
@@ -72,7 +72,7 @@ public class App extends Application {
 	}
 
 	public static void runDynamic(ControlSet controlSet) {
-		Dispatcher disp = new DynamicDispatcher();
+		IDispatcher disp = new DynamicDispatcher();
 		long startTime = System.nanoTime();
 		disp.dispatch(controlSet);
 		Float timing = Float.valueOf((System.nanoTime() - startTime) / (1000000));
@@ -84,7 +84,7 @@ public class App extends Application {
 	}
 
 	public static void runWot(ControlSet controlSet) {
-		Dispatcher disp = new WithOutThreadsDispatcher();
+		IDispatcher disp = new WithoutThreadsDispatcher();
 		long startTime = System.nanoTime();
 		disp.dispatch(controlSet);
 		Float timing = Float.valueOf((System.nanoTime() - startTime) / (1000000));

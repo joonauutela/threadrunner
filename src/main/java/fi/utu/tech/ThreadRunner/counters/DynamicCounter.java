@@ -6,35 +6,30 @@ package fi.utu.tech.ThreadRunner.counters;
 * @version     1.0                 
 * @since       1.0          
 */
-import java.util.ArrayList;
-import fi.utu.tech.ThreadRunner.workers.Worker;
-import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
+
 import fi.utu.tech.ThreadRunner.dispatchers.ControlSet;
+import fi.utu.tech.ThreadRunner.dispatchers.TaskGroup;
 
 
-public class DynamicCounter extends Thread {
-	
+public class DynamicCounter extends CounterBase {	
 	private TaskGroup taskGroup;
-	private Worker worker;
-	private ControlSet controlSet;
 	
 	public DynamicCounter(ControlSet controlSet, TaskGroup taskGroup) {
+		super(controlSet);
 		this.taskGroup = taskGroup;
-		this.controlSet = controlSet;
 	}
 	
-	public void run() {
-
-		ArrayList<Integer> ilist;
+	protected void runCounter() 
+	{
 		try {
-			worker = WorkerFactory.createWorker(controlSet.getWorkerType());
 			while(taskGroup.areTasksLeft()) {
-				ilist = taskGroup.assignTasks();
+				var ilist = taskGroup.assignTasks();
 				for (int time :  ilist) {
 					worker.count(time);
 				}
 			}
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 		    e.printStackTrace();
 		}
 	}

@@ -2,32 +2,26 @@ package fi.utu.tech.ThreadRunner.counters;
 
 
 import java.util.ArrayList;
-import fi.utu.tech.ThreadRunner.tasks.Countable;
-import fi.utu.tech.ThreadRunner.tasks.TaskFactory;
-import fi.utu.tech.ThreadRunner.workers.Worker;
-import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
 import fi.utu.tech.ThreadRunner.dispatchers.ControlSet;
 
 
-public class StaticCounter extends Thread {
+public class StaticCounter extends CounterBase {
 	
 	private ArrayList<Integer> ilist;
-	private Worker worker;
-	private ControlSet controlSet;
 	
 	public StaticCounter(ArrayList<Integer> ilist, ControlSet controlSet) {
-		System.out.println(ilist.size());
+		super(controlSet);
 		this.ilist = ilist;
-		this.controlSet = controlSet;
 	}
 	
-	public void run() {
+	protected void runCounter() 
+	{
 		try {
-			worker = WorkerFactory.createWorker(controlSet.getWorkerType());
 			for (int time : ilist) {
-				worker.count(time);
+				super.worker.count(time);
 			}
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 		    e.printStackTrace();
 		}
 	}
