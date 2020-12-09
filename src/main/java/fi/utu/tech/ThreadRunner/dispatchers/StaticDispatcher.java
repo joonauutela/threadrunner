@@ -5,7 +5,7 @@ import fi.utu.tech.ThreadRunner.tasks.Countable;
 import fi.utu.tech.ThreadRunner.tasks.TaskFactory;
 import fi.utu.tech.ThreadRunner.workers.Worker;
 import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
-
+import fi.utu.tech.ThreadRunner.counters.StaticCounter;
 /*
  * Luokka, jossa toteutetaan staattinen tehtävien jako ts. työn tehtävä 1
  * 
@@ -29,7 +29,7 @@ public class StaticDispatcher implements Dispatcher {
 			// Luo tehtävät
 			ArrayList<Integer> ilist = co.generate(controlSet.getAmountTasks(), controlSet.getMaxTime());
 			// Alusta lista säikeille
-			ArrayList<StaticThread> threads = new ArrayList<StaticThread>();
+			ArrayList<StaticCounter> threads = new ArrayList<StaticCounter>();
 			
 			// Muuttuja-alustukset tehtäväjakoa varten
 			int threadCount = controlSet.getThreadCount();
@@ -47,43 +47,20 @@ public class StaticDispatcher implements Dispatcher {
 					take = tasksPerThread;
 				}
 				ArrayList<Integer> ilistThread = new ArrayList<Integer>(ilist.subList(i, Math.min( ilist.size(), i + take )));		
-				threads.add(new StaticThread(ilistThread, controlSet));
+				threads.add(new StaticCounter(ilistThread, controlSet));
 			}
 			
 			// Käynnistä säikeet
-			for(StaticThread thread: threads) {
+			for(StaticCounter thread: threads) {
 				thread.start();
 			}
 			// Odota säikeiden suoritusta
-			for(StaticThread thread: threads) {
+			for(StaticCounter thread: threads) {
 				thread.join();
 			}
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
-	}
-}
-
-class StaticThread extends Thread {
-	
-	private ArrayList<Integer> ilist;
-	Worker worker;
-	ControlSet controlSet;
-	
-	public StaticThread(ArrayList<Integer> ilist, ControlSet controlSet) {
-		this.ilist = ilist;
-		this.controlSet = controlSet;
-	}
-	
-	public void run() {
-		try {
-			Worker worker = WorkerFactory.createWorker(controlSet.getWorkerType());
-			for (int time : ilist) {
-				worker.count(time);
-			}
-		} catch (Exception e) {
-		    e.printStackTrace();
 		}
 	}
 }
