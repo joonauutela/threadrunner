@@ -14,16 +14,20 @@ import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
  * Datalle on tässä tilanteessa mielekkäämpi luoda olio sen sijaan, että käyttäisi esim. sisäkkäisiä ArrayListejä
  *
  */
-public class SharedData {
+public class TaskGroup {
 	
-	ArrayList<ArrayList<Integer>> taskGroups;
+	private ArrayList<ArrayList<Integer>> taskGroups;
 	
-	public SharedData() {
+	public TaskGroup() {
 		taskGroups = new ArrayList<ArrayList<Integer>>();
 	}
 	
-	public void addTasks(ArrayList<Integer> subList) {
+	public void addTaskGroup(ArrayList<Integer> subList) {
 		taskGroups.add(subList);
+	}
+	
+	public int getTaskGroupCount() {
+		return taskGroups.size();
 	}
 	
 	public synchronized ArrayList<Integer> assignTasks(){

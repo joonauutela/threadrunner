@@ -7,8 +7,6 @@ package fi.utu.tech.ThreadRunner.counters;
 * @since       1.0          
 */
 import java.util.ArrayList;
-import fi.utu.tech.ThreadRunner.tasks.Countable;
-import fi.utu.tech.ThreadRunner.tasks.TaskFactory;
 import fi.utu.tech.ThreadRunner.workers.Worker;
 import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
 import fi.utu.tech.ThreadRunner.dispatchers.ControlSet;
@@ -16,12 +14,12 @@ import fi.utu.tech.ThreadRunner.dispatchers.ControlSet;
 
 public class DynamicCounter extends Thread {
 	
-	SharedData sd;
-	Worker worker;
-	ControlSet controlSet;
+	private TaskGroup taskGroup;
+	private Worker worker;
+	private ControlSet controlSet;
 	
-	public DynamicCounter(ControlSet controlSet, SharedData sd) {
-		this.sd = sd;
+	public DynamicCounter(ControlSet controlSet, TaskGroup taskGroup) {
+		this.taskGroup = taskGroup;
 		this.controlSet = controlSet;
 	}
 	
@@ -29,9 +27,9 @@ public class DynamicCounter extends Thread {
 
 		ArrayList<Integer> ilist;
 		try {
-			Worker worker = WorkerFactory.createWorker(controlSet.getWorkerType());
-			while(sd.areTasksLeft()) {
-				ilist = sd.assignTasks();
+			worker = WorkerFactory.createWorker(controlSet.getWorkerType());
+			while(taskGroup.areTasksLeft()) {
+				ilist = taskGroup.assignTasks();
 				for (int time :  ilist) {
 					worker.count(time);
 				}

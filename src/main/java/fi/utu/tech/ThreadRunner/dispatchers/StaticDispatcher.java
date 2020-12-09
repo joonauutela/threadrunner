@@ -3,8 +3,6 @@ package fi.utu.tech.ThreadRunner.dispatchers;
 import java.util.ArrayList;
 import fi.utu.tech.ThreadRunner.tasks.Countable;
 import fi.utu.tech.ThreadRunner.tasks.TaskFactory;
-import fi.utu.tech.ThreadRunner.workers.Worker;
-import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
 import fi.utu.tech.ThreadRunner.counters.StaticCounter;
 /*
  * Luokka, jossa toteutetaan staattinen tehtävien jako ts. työn tehtävä 1
@@ -33,31 +31,22 @@ public class StaticDispatcher implements Dispatcher {
 			
 			// Muuttuja-alustukset tehtäväjakoa varten
 			int threadCount = controlSet.getThreadCount();
-			int tasksPerThread = ilist.size()/threadCount;
-			int leftOverTasks = ilist.size() % threadCount;
-			int take = tasksPerThread;
+			float tasksPerThread = ilist.size()/(float)threadCount;
+			int minTasksPerThread = (int)Math.floor(tasksPerThread);
+			int bonusTasksForFirstNThreads = (int)Math.ceil((tasksPerThread%1)*threadCount);  
 			
-			// Jaa tehtävät säikeiden kesken
-			for(int i=0; i < ilist.size(); i+=take) {
-				if(leftOverTasks > 0) {
-					leftOverTasks--;
-					take = tasksPerThread + 1;
-
-				} else {
-					take = tasksPerThread;
-				}
-				ArrayList<Integer> ilistThread = new ArrayList<Integer>(ilist.subList(i, Math.min( ilist.size(), i + take )));		
-				threads.add(new StaticCounter(ilistThread, controlSet));
+			// Jaa tehtävät säikeille
+			for(int threadId=0,firstTaskId = 0; threadId < threadCount; threadId++) {
+				int lastTaskId = firstTaskId+ minTasksPerThread+ (threadId<bonusTasksForFirstNThreads?1:0); 
+				var subList = ilist.subList(firstTaskId,lastTaskId);		
+				threads.add(new StaticCounter(new ArrayList<Integer>(subList), controlSet));
+				firstTaskId = lastTaskId; 
 			}
-			
+						
 			// Käynnistä säikeet
-			for(StaticCounter thread: threads) {
-				thread.start();
-			}
+			for(StaticCounter thread: threads) thread.start();
 			// Odota säikeiden suoritusta
-			for(StaticCounter thread: threads) {
-				thread.join();
-			}
+			for(StaticCounter thread: threads) thread.join();
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();

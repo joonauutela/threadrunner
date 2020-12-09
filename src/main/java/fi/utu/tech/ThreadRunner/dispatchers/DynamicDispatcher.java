@@ -6,13 +6,12 @@ package fi.utu.tech.ThreadRunner.dispatchers;
 * @version     1.0                 
 * @since       1.0          
 */
+
 import java.util.ArrayList;
 import fi.utu.tech.ThreadRunner.tasks.Countable;
 import fi.utu.tech.ThreadRunner.tasks.TaskFactory;
-import fi.utu.tech.ThreadRunner.workers.Worker;
-import fi.utu.tech.ThreadRunner.workers.WorkerFactory;
 import fi.utu.tech.ThreadRunner.counters.DynamicCounter;
-import fi.utu.tech.ThreadRunner.counters.SharedData;
+import fi.utu.tech.ThreadRunner.counters.TaskGroup;
 
 public class DynamicDispatcher implements Dispatcher {
 
@@ -30,32 +29,27 @@ public class DynamicDispatcher implements Dispatcher {
 			// Luo tehtävät
 			ArrayList<Integer> ilist = co.generate(controlSet.getAmountTasks(), controlSet.getMaxTime());
 			// Tehtäväosajoukkojen lista
-			SharedData sharedData = new SharedData();
+			TaskGroup taskGroup = new TaskGroup();
 			
 			// Muuttuja-alustukset tehtäväjakoa varten
 			int threadCount = controlSet.getThreadCount();
-			int tasksPerThread = ilist.size()/threadCount;
-			int leftOverTasks = ilist.size() % threadCount;
-			int take = tasksPerThread;
+			float tasksPerThread = ilist.size()/(float)threadCount;
+			int minTasksPerThread = (int)Math.floor(tasksPerThread);
+			int bonusTasksForFirstNThreads = (int)Math.ceil((tasksPerThread%1)*threadCount);  
 			
-			// Jaa tehtävät huomattavasti suurempaan määrään osajoukkoja kuin on säikeitä
-			for(int i=0; i < ilist.size(); i+=take) {
-				if(leftOverTasks > 0) {
-					leftOverTasks--;
-					take = (int)Math.ceil(tasksPerThread/3) + 1;
-
-				} else {
-					take = (int)Math.ceil(tasksPerThread/3);
-				}
-				ArrayList<Integer> ilistThread = new ArrayList<Integer>(ilist.subList(i, Math.min( ilist.size(), i + take )));		
-				sharedData.addTasks(ilistThread);
+			// Jaa tehtävät säikeille
+			for(int threadId=0,firstTaskId = 0; threadId < threadCount; threadId++) {
+				int lastTaskId = firstTaskId + minTasksPerThread+ (threadId<bonusTasksForFirstNThreads?1:0); 
+				var subList = ilist.subList(firstTaskId,lastTaskId);
+				taskGroup.addTaskGroup(new ArrayList<Integer>(subList));
+				firstTaskId = lastTaskId; 
 			}
 			
 			// Alusta ja käynnistä koordinaattorisäie
-			Coordinator coordinator = new Coordinator(sharedData, controlSet,threadCount);
+			Coordinator coordinator = new Coordinator(taskGroup, controlSet);
 			coordinator.start();
 			coordinator.join();
-	
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -67,13 +61,13 @@ public class DynamicDispatcher implements Dispatcher {
  */
 class Coordinator extends Thread {
 	
-	Thread[] threads;
+	private Thread[] threads;
 	
-	public Coordinator(SharedData sharedData, ControlSet controlSet, int threadCount) {
-		
+	public Coordinator(TaskGroup taskGroup, ControlSet controlSet) {
+		int threadCount = taskGroup.getTaskGroupCount();
 		threads = new Thread[threadCount];
 		for(int i=0; i<threadCount; i++) {
-			threads[i] = new DynamicCounter(controlSet, sharedData);
+			threads[i] = new DynamicCounter(controlSet, taskGroup);
 		}
 	}
 	

@@ -12,8 +12,8 @@ import fi.utu.tech.ThreadRunner.dispatchers.ControlSet;
 public class StaticCounter extends Thread {
 	
 	private ArrayList<Integer> ilist;
-	Worker worker;
-	ControlSet controlSet;
+	private Worker worker;
+	private ControlSet controlSet;
 	
 	public StaticCounter(ArrayList<Integer> ilist, ControlSet controlSet) {
 		System.out.println(ilist.size());
@@ -23,7 +23,7 @@ public class StaticCounter extends Thread {
 	
 	public void run() {
 		try {
-			Worker worker = WorkerFactory.createWorker(controlSet.getWorkerType());
+			worker = WorkerFactory.createWorker(controlSet.getWorkerType());
 			for (int time : ilist) {
 				worker.count(time);
 			}
